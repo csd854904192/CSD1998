@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shar.sharingspring.mapper.FileMapper">
+
+<!--	查询下载文档-->
+	<select id="findDowFiles" resultType="Files" parameterType="java.lang.Integer">
+		select * from doctable where docid = #{docid}
+	</select>
+<!--	修改下载次数-->
+	<update id="updateDowCount" parameterType="java.lang.Integer">
+		update doctable set dowcount = #{dowcount} where docid = #{docid}
+	</update>
+	<select id="findFiles" resultType="Files" parameterType="java.util.Map">
+		select * from doctable where 1=1
+		<if test="docname != null">
+			and docname like concat('%',#{docname},'%')
+		</if>
+		<if test="doctime1 != null and doctime1 !=''">
+			and updoctime &gt;= #{doctime1}
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and updoctime &lt;= #{endTime}
+		</if>
+		limit #{pageInts},#{limitInt}
+	</select>
+	<select id="findAllFiles" resultType="java.lang.Integer" parameterType="java.util.Map" >
+		select count(*) from doctable where 1=1
+		<if test="docname != null">
+			and docname like concat('%',#{docname},'%')
+		</if>
+		<if test="doctime1 != null and doctime1 !=''">
+			and updoctime &gt;= #{doctime1}
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and updoctime &lt;= #{endTime}
+		</if>
+	</select>
+	<select id="findManagerFile" resultType="Files" parameterType="java.util.Map">
+		select * from doctable where 1=1
+		<if test="docname != null">
+			and docname like concat('%',#{docname},'%')
+		</if>
+		<if test="userid != null">
+			and userid like concat('%',#{userid},'%')
+		</if>
+		<if test="doctime1 != null and doctime1 !=''">
+			and updoctime &gt;= #{doctime1}
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and updoctime &lt;= #{endTime}
+		</if>
+		<if test="doctype != null">
+			and doctype = #{doctype}
+		</if>
+		and docstatu = '未审核'
+		limit #{pageInts},#{limitInt}
+	</select>
+	<select id="findManagerAllFile" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(*) from doctable where 1=1
+		<if test="docname != null">
+			and docname like concat('%',#{docname},'%')
+		</if>
+		<if test="userid != null">
+			and userid like concat('%',#{userid},'%')
+		</if>
+		<if test="doctime1 != null and doctime1 !=''">
+			and updoctime &gt;= #{doctime1}
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and updoctime &lt;= #{endTime}
+		</if>
+		<if test="doctype != null">
+			and doctype = #{doctype}
+		</if>
+		and docstatu = '未审核'
+	</select>
+
+	<select id="findUserName" parameterType="String" resultType="User">
+		select * from usertable where username = #{username}
+	</select>
+<!--上传插入-->
+	<insert id="UpLoadFiles"  parameterType="com.shar.sharingspring.javabean.Files" >
+			insert into doctable (docname,docdes,doctype,docscore,updoctime,docstatu,dowcount,userid,docurl)
+		VALUES(#{docname},#{docdes},#{doctype},#{docscore},#{updoctime},#{docstatu},#{dowcount},#{userid},#{docurl})
+	</insert>
+<!--搜索文档-->
+	<select id="findConFiles" resultType="Files" parameterType="java.util.Map">
+		select * from doctable
+		<where>
+			<if test="docname != null">
+			 and docname like concat('%',#{docname},'%')
+			</if>
+		</where>
+
+		limit #{pageInts},#{limitInt}
+	</select>
+	<select id="findConAllFiles" resultType="java.lang.Integer" parameterType="java.util.Map" >
+		select count(*) from doctable
+		<where>
+			<if test="docname != null">
+			and docname like concat('%',#{docname},'%')
+			</if>
+		</where>
+	</select>
+<!--查找文件格式-->
+	<select id="findDocType" resultType="DocType">
+		select * from doctype
+	</select>
+<!--审核更改文档状态-->
+	<update id="changeDocState" parameterType="java.util.Map" >
+        update doctable  set docstatu = #{docstatu} where docid =#{docid}
+    </update>
+<!--文档配置查询文档-->
+	<select id="findType" resultType="DocType" parameterType="java.util.Map" >
+		select * from doctype
+		<where>
+			<if test="typename !='' and typename!=null">
+				and typename like concat('%',#{typename},'%')
+			</if>
+		</where>
+		limit #{pageInts},#{limitInt}
+	</select>
+<!--文档配置配置格式数-->
+	<select id="findTypeCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(*) from doctype
+		<where>
+			<if test="typename !='' and typename!=null">
+				and typename = #{typename}
+			</if>
+		</where>
+	</select>
+	<!--删除文档格式-->
+	<delete id="deleteType"  parameterType="java.lang.Integer">
+        delete from doctype where typeid =#{typeid}
+    </delete>
+
+	<!--更新文档格式信息-->
+	<update id="updateType" parameterType="DocType"  >
+		update doctype set typename = #{typename},bounty = #{bounty} where typeid =#{typeid}
+	</update>
+
+	<!--添加文档格式信息-->
+	<insert id="addType" parameterType="DocType"  >
+		insert  into doctype  (typename,bounty) VALUES (#{typename},#{bounty})
+	</insert>
+</mapper>

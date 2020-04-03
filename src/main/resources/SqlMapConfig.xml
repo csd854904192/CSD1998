@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <package name="com.shar.sharingspring.javabean" /><!--这是给entity包下所有类取别名，在用完全限定命名的情况下可以通过类名直接调用 -->
+    </typeAliases>
+
+</configuration>

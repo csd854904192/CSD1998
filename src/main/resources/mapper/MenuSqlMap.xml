@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shar.sharingspring.mapper.MenuMapper">
+	<select id="findMenus" parameterType="java.util.List" resultType="Menu">
+		select m.* from menutable m join menurela mr on (m.menuid = mr.menuid)
+		where m.menufid = #{menufid} and mr.roleid = #{roleid}
+	</select>
+<!--查询所有的父级菜单，不区分角色	-->
+	<select id="findAllFMenu" parameterType="java.util.List" resultMap="TreeMap1">
+		select * from menutable m where m.menuid in (select r.menuid from menurela r,menutable m ) and m.menufid = 0
+	</select>
+	<!--根据角色id到关系表中查找所有的菜单id-->
+	<select id="findAllRMenu" resultMap="TreeMap2" parameterType="java.lang.Integer">
+       select r.menuid from menurela r,menutable m where r.roleid =#{roleid} and
+       m.menufid != 0 and r.menuid = m.menuid
+    </select>
+	<!--根据父id查找到对应的子id -->
+	<select id="childrenByFid" resultMap="Tree1" parameterType="java.lang.Integer">
+		select * from menutable m where  m.menufid = #{menuid}
+    </select>
+<!--删除原先配置	-->
+	<delete id="deleteMenuRela" parameterType="java.lang.Integer">
+		delete from menurela where roleid = #{roleid}
+	</delete>
+<!--增加新配置	-->
+	<insert id="addMenurela" parameterType="java.util.List">
+		insert into menurela (roleid,menuid) values
+		<foreach collection="list" item="item" index="index"
+		separator=",">
+		(#{item.roleid},#{item.menuid})
+		</foreach>
+	</insert>
+
+	<resultMap type="com.shar.sharingspring.javabean.TreeResult" id="TreeMap1">
+		<result column="menuname" property="title"/>
+		<result column="menuid" property="id"/>
+		<collection property="children"  select="childrenByFid" column="menuid" ofType="TreeResult" javaType="list">
+			<result column="menuname" property="title"/>
+			<result column="menuid" property="id"/>
+		</collection>
+	</resultMap>
+	<resultMap type="com.shar.sharingspring.javabean.TreeResult" id="TreeMap2">
+		<result column="menuid" property="id"></result>
+	</resultMap>
+	<resultMap type="com.shar.sharingspring.javabean.TreeResult" id="Tree1">
+		<result column="menuname" property="title"></result>
+		<result column="menuid" property="id"></result>
+	</resultMap>
+</mapper>

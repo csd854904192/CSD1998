@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shar.sharingspring.mapper.DeptMapper">
+	<select id="findUser" resultType="User" parameterType="int">
+		select username,userpwd from usertable where userid = #{userid}
+	</select>
+	<resultMap id="userMap" type="User">
+		<association property="role" javaType="role" select="selectrole"
+					 column="roleid"></association>
+	</resultMap>
+	<select id="selectrole" parameterType="java.lang.Integer" resultType="Role">
+		select * from role where roleid = #{roleid}
+	</select>
+	<select id="findRole" resultType="Role">
+		select * from role
+	</select>
+     <select id="UserLogin" resultMap="userMap" parameterType="java.util.Map">
+		 select * from usertable where username = #{username} and userpwd = #{userpwd}
+	 </select>
+	<select id="findusers" resultType="User" parameterType="java.util.Map">
+		select * from usertable
+		<where>
+			<if test="username != null">
+				and username like concat('%',#{username},'%')
+			</if>
+		</where>
+		limit #{pageInts},#{limitInt}
+	</select>
+	<select id="findAllusers" resultType="java.lang.Integer" parameterType="java.util.Map" >
+       select count(*) from usertable
+       <where>
+		   <if test="username != null">
+		   and username like concat('%',#{username},'%')
+		   </if>
+	   </where>
+	</select>
+	<insert id="addUser"  parameterType="java.util.List">
+		insert into usertable(username,userpwd,usersex,degree,occupation,userphone,email)values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.username}
+			,#{item.userpwd}
+			,#{item.usersex}
+			,#{item.degree}
+			,#{item.occupation}
+			,#{item.userphone}
+			,#{item.email})
+		</foreach>
+	</insert>
+	<insert id="regUser"  parameterType="User">
+		insert into usertable(username,userpwd,usersex,degree,occupation,userphone,email)values
+	   (#{username},#{userpwd},#{usersex},#{degree},#{occupation},#{userphone},#{email})
+	</insert>
+	<update id="updateInfo" parameterType="User" >
+           update usertable set
+           username = #{username}
+           ,userpwd = #{userpwd}
+           ,occupation = #{occupation}
+           ,degree = #{degree}
+           ,userphone = #{userphone}
+           ,usersex = #{usersex}
+           ,email = #{email}
+           where userid = #{userid}
+	</update>
+	<delete id="deleteUser" parameterType="int">
+		delete from usertable
+        where userid = #{userid}
+	</delete>
+
+
+</mapper>
